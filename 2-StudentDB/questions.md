@@ -5,7 +5,7 @@ Please answer the following questions and submit in your repo for the second ass
 
 1. In this assignment I asked you provide an implementation for the `get_student(...)` function because I think it improves the overall design of the database application.   After you implemented your solution do you agree that externalizing `get_student(...)` into it's own function is a good design strategy?  Briefly describe why or why not.
 
-    > **Answer**:  I think it was a good design strategy but I don't think it was super helpful. I only used that function to print a user and delete a user. I would use it to check if a student ID was available (all zeros) but because of memory management by the OS, not all empty student blocks are zeros. This would cause undefined behavior so my current implementation off add_student is correct.
+    > **Answer**:  I think it was a good design strategy but I don't think it was super helpful. I only used that function to print a user and delete a user. I would use it to check if a student ID was available (all zeros) for the add_student function but because of memory management by the OS, not all empty student blocks are zeros. This would cause undefined behavior so my current implementation off add_student is correct.
 
 2. Another interesting aspect of the `get_student(...)` function is how its function prototype requires the caller to provide the storage for the `student_t` structure:
 
@@ -39,7 +39,7 @@ Please answer the following questions and submit in your repo for the second ass
     ```
     Can you think of any reason why the above implementation would be a **very bad idea** using the C programming language?  Specifically, address why the above code introduces a subtle bug that could be hard to identify at runtime? 
 
-    > **ANSWER:** This is not a good implementation because it stores 'student_t student' on the functions stack. While it returns the location to the stack, the functions stack will be deleted. So, if you add data to the stack again, it could over right in the return address.
+    > **ANSWER:** This is not a good implementation because it stores 'student_t student' on the functions stack. While it returns the location to the stack, the functions stack will be deleted. So, if you add data to the stack again, it could overwrite in the return address.
 
 3. Another way the `get_student(...)` function could be implemented is as follows:
 
@@ -72,7 +72,7 @@ Please answer the following questions and submit in your repo for the second ass
     ```
     In this implementation the storage for the student record is allocated on the heap using `malloc()` and passed back to the caller when the function returns. What do you think about this alternative implementation of `get_student(...)`?  Address in your answer why it work work, but also think about any potential problems it could cause.  
     
-    > **ANSWER:** This is a better implementation than the previous because it removes the possibility of stack corruption. However, a memory leak can occur if the calling function does not free the memory.
+    > **ANSWER:** This is a better implementation than the previous because it removes the possibility of stack corruption. However, a memory leak can occur if the calling function does not free the memory. In this case it does, but failure to do so will cause problems.
 
 
 4. Lets take a look at how storage is managed for our simple database. Recall that all student records are stored on disk using the layout of the `student_t` structure (which has a size of 64 bytes).  Lets start with a fresh database by deleting the `student.db` file using the command `rm ./student.db`.  Now that we have an empty database lets add a few students and see what is happening under the covers.  Consider the following sequence of commands:
