@@ -114,11 +114,9 @@ int add_student(int fd, int id, char *fname, char *lname, int gpa){
     student_to_add.id = id;
     student_to_add.gpa = gpa;
     // fname
-    strncpy(student_to_add.fname, fname, sizeof(student_to_add.fname) - 1);
-    student_to_add.fname[sizeof(student_to_add.fname) - 1] = '\0';
+    strncpy(student_to_add.fname, fname, sizeof(student_to_add.fname));
     // lname
-    strncpy(student_to_add.lname, lname, sizeof(student_to_add.lname) - 1);
-    student_to_add.lname[sizeof(student_to_add.lname) - 1] = '\0';
+    strncpy(student_to_add.lname, lname, sizeof(student_to_add.lname));
 
     // check if student exist
     if (memcmp(&curr_db, &student_to_add, sizeof(student_t)) == 0 ||
