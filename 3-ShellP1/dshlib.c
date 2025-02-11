@@ -32,8 +32,21 @@
  *  Standard Library Functions You Might Want To Consider Using
  *      memset(), strcmp(), strcpy(), strtok(), strlen(), strchr()
  */
+
+
+void execute_tasks_p1(Parse *P){
+    unsigned int t;
+
+    for (t = 0; t < P->ntasks; t++) {
+        if (is_builtin(P->tasks[t].cmd)) {
+            builtin_execute(P->tasks[t]);
+        }
+    }
+}
+/*
 int build_cmd_list(char *cmd_line, command_list_t *clist)
 {
     printf(M_NOT_IMPL);
     return EXIT_NOT_IMPL;
 }
+*/

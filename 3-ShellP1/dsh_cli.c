@@ -1,8 +1,16 @@
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <readline/readline.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <fcntl.h>
 
 #include "dshlib.h"
+#include "builtin.h"
+#include "parse.h"
 
 /*
  * Implement your main function by building a loop that prompts the
@@ -46,10 +54,45 @@
  */
 int main()
 {
-    char *cmd_buff;
-    int rc = 0;
-    command_list_t clist;
+    char *cmd_buff[ARG_MAX] = {0};
+    Parse *P;
 
-    printf(M_NOT_IMPL);
-    exit(EXIT_NOT_IMPL);
+    while (1) {
+        /* do NOT replace readline() with scanf() or anything else! */
+        printf("%s", SH_PROMPT);
+        if (fgets(cmd_buff, ARG_MAX, stdin) == NULL){
+           printf("\n");
+           break;
+        }
+        //remove the trailing \n from cmd_buff
+        cmd_buff[strcspn(cmd_buff,"\n")] = '\0';
+
+        P = parse_cmdline(cmd_buff);
+        if (!P)
+            goto next;
+
+        if (P->invalid_syntax) {
+            printf("pssh: invalid syntax\n");
+            goto next;
+        }
+
+//#if DEBUG_PARSE
+        //parse_debug(P);
+//#endif
+
+        // execute_tasks(P);
+        
+
+        if(P->ntasks == 0){
+            fprintf(stderr, CMD_WARN_NO_CMD);
+        } else if (P->ntasks > CMD_MAX) {
+            fprintf(stderr, CMD_ERR_PIPE_LIMIT, CMD_MAX);
+        } else {
+            parse_debug(P);
+        }
+        execute_tasks_p1(P);
+
+    next:
+        parse_destroy(&P);
+    }
 }
