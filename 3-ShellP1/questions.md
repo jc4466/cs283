@@ -16,7 +16,7 @@
 - One topic you should have found information on is "redirection". Please provide at least 3 redirection examples that we should implement in our custom shell, and explain what challenges we might have implementing them.
 
     > **Answer**: Examples:
-        `ls > files.txt'
+        `ls > files.txt`
         `wc < some_story.txt`
         `sort < names.txt`
         Challenges that may arise when implementing them are not using the correct file descriptors. I implemented them in another class but the redirection wasn't too bad.
