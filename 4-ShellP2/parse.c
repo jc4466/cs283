@@ -28,7 +28,6 @@
 #include <stdlib.h>
 
 #include "parse.h"
-#include "dshlib.h"
 
 
 typedef struct {
@@ -439,20 +438,25 @@ void parse_debug(Parse *P)
 {
     int i, j;
 
-    fprintf(stderr, CMD_OK_HEADER, P->ntasks);
+    fprintf(stderr, "==[ DEBUG: PARSE ]==================================\n");
+    fprintf(stderr, "Run in Background? %s\n", P->background ? "Yes" : "No");
+
+    if (P->infile)
+        fprintf(stderr, "infile: %s\n", P->infile);
+
+    if (P->outfile)
+        fprintf(stderr, "outfile: %s\n", P->outfile);
+
+    fprintf(stderr, "ntasks: %i\n", P->ntasks);
 
     for (i=0; i<P->ntasks; i++) {
-        fprintf(stderr, "<%i> ", i+1);
-        fprintf(stderr, "%s", P->tasks[i].cmd);
+        fprintf(stderr, "Task %i\n", i);
+        fprintf(stderr, "  - cmd: [%s]\n", P->tasks[i].cmd);
 
-        if (P->tasks[i].argv[1]){
-            fprintf(stderr, " [");
-            for (j=1; P->tasks[i].argv[j]; j++)
-                fprintf(stderr, "%s ", P->tasks[i].argv[j]);
-        
-            fprintf(stderr, "\b]");
-        }
-        fprintf(stderr, "\n");
+        if (P->tasks[i].argv)
+            for (j=0; P->tasks[i].argv[j]; j++)
+                fprintf(stderr, "    + arg[%i]: [%s]\n", j, P->tasks[i].argv[j]);
     }
-    
+
+    fprintf(stderr, "==================================[ DEBUG: PARSE ]==\n");
 }

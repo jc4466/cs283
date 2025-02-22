@@ -1,34 +1,41 @@
-1. In this assignment I suggested you use `fgets()` to get user input in the main while loop. Why is `fgets()` a good choice for this application?
+1. Can you think of why we use `fork/execvp` instead of just calling `execvp` directly? What value do you think the `fork` provides?
 
-    > **Answer**: fgets() is a good choice because it doesn't require you to free the buffer like readline does. However unlike readline(), you can't enter a prompt so we must print "dsh>" beforehand.
+    > **Answer**:  If we call `execvp` directly, the process that is running the shell will have its virtual memory wiped and will run the exec'd command. So it will exit after and our shell will be gone. When we fork we create another process, so when the exec'd function return, our shell will be safe since it is a separate process.
 
-2. You needed to use `malloc()` to allocate memory for `cmd_buff` in `dsh_cli.c`. Can you explain why you needed to do that, instead of allocating a fixed-size array?
+2. What happens if the fork() system call fails? How does your implementation handle this scenario?
 
-    > **Answer**:  Allocating memory is better since the cmd prompt will vary in size each iteration.
+    > **Answer**:  If the fork() fails, the program will print to stderr and the command will not be executed.
 
+3. How does execvp() find the command to execute? What system environment variable plays a role in this process?
 
-3. In `dshlib.c`, the function `build_cmd_list(`)` must trim leading and trailing spaces from each command before storing it. Why is this necessary? If we didn't trim spaces, what kind of issues might arise when executing commands in our shell?
+    > **Answer**:  `execvp()` searches through the PATH environment variable. This is a list of colon separated directory pathnames and it will search for the command in there.
 
-    > **Answer**:  When we use execve() we must be exact. Trimming command line is part of parsing in any program.
+4. What is the purpose of calling wait() in the parent process after forking? What would happen if we didn’t call it?
 
-4. For this question you need to do some research on STDIN, STDOUT, and STDERR in Linux. We've learned this week that shells are "robust brokers of input and output". Google _"linux shell stdin stdout stderr explained"_ to get started.
+    > **Answer**:  If we didn't call `wait()`, then our shell process may be scheduled before the exec'd process so it may prompt the user for another input. There would be undefined behavior since we can't predict CPU scheduling.
 
-- One topic you should have found information on is "redirection". Please provide at least 3 redirection examples that we should implement in our custom shell, and explain what challenges we might have implementing them.
+5. In the referenced demo code we used WEXITSTATUS(). What information does this provide, and why is it important?
 
-    > **Answer**: Examples:
-        `ls > files.txt'
-        `wc < some_story.txt`
-        `sort < names.txt`
-        Challenges that may arise when implementing them are not using the correct file descriptors. I implemented them in another class but the redirection wasn't too bad.
+    > **Answer**:  The `wait()` parameter (e.g. `wait(&status)`) stores an int that contains info. The `WEXITSTATUS()` will strip the int and give the exit status of the child's process.
 
-- You should have also learned about "pipes". Redirection and piping both involve controlling input and output in the shell, but they serve different purposes. Explain the key differences between redirection and piping.
+6. Describe how your implementation of build_cmd_buff() handles quoted arguments. Why is this necessary?
 
-    > **Answer**:  Redirection is changing the stdin or stdout file descriptor to an actual file (often a .txt). Piping is a form of inner-process communication (IPC) where two processes can communicate through a half-duplex pipe that the kernel owns. Piping is used to redirect the output of one process to the input of another in shells.
+    > **Answer**: I did not implement build_cmd_buff(). I used a parser from another class.
 
-- STDERR is often used for error messages, while STDOUT is for regular output. Why is it important to keep these separate in a shell?
+7. What changes did you make to your parsing logic compared to the previous assignment? Were there any unexpected challenges in refactoring your old code?
 
-    > **Answer**:  When we pipe or redirect, it is important to distinct the two because we wouldn't want errors to go into out file, because we wouldn't see the error right away. Keeping STDERR print out to the screen helps us diagnose issues.
+    > **Answer**: I didn't make any changes. My parsing logic in the previous assignment gave me all the tools to complete this one.
 
-- How should our custom shell handle errors from commands that fail? Consider cases where a command outputs both STDOUT and STDERR. Should we provide a way to merge them, and if so, how?
+8. For this quesiton, you need to do some research on Linux signals. You can use [this google search](https://www.google.com/search?q=Linux+signals+overview+site%3Aman7.org+OR+site%3Alinux.die.net+OR+site%3Atldp.org&oq=Linux+signals+overview+site%3Aman7.org+OR+site%3Alinux.die.net+OR+site%3Atldp.org&gs_lcrp=EgZjaHJvbWUyBggAEEUYOdIBBzc2MGowajeoAgCwAgA&sourceid=chrome&ie=UTF-8) to get started.
 
-    > **Answer**: Our custom shell should print to stderr if a command fails. It is best not to merge the two command outputs.
+- What is the purpose of signals in a Linux system, and how do they differ from other forms of interprocess communication (IPC)?
+
+    > **Answer**: Signals differ from IPC because a process will receive a signal as soon as it is scheduled on the CPU. Each signal has a default action and if it is not masked, or handled differently, that signal will execute the action. 
+
+- Find and describe three commonly used signals (e.g., SIGKILL, SIGTERM, SIGINT). What are their typical use cases?
+
+    > **Answer**:  SIGKILL will terminate a process immediately. This signal cannot be masked. SIGINT is when the user presses `CTRL+C`. This will stop the running process in the terminal immediately. This is used for foreground process when you cannot "kill" a process in the terminal. SIGCHILD is sent to the parent process whenever one of its child changes state. The default for this is to ignore it.
+
+- What happens when a process receives SIGSTOP? Can it be caught or ignored like SIGINT? Why or why not?
+
+    > **Answer**:  When a process receives SIGSTOP it will immediately be stopped until it receives SIGCONT. This process cannot execute a custom handler unlike SIGINT. Also it doesn't terminate a process just stops it.

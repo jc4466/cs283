@@ -4,9 +4,7 @@
 #include "parse.h"
 
 int is_builtin(char *cmd);
-void builtin_execute(Task T);
-int builtin_which(Task T);
-void execute_which(Task T);
-void print_dragon();
+void builtin_execute(Task *T);
+int execute_cd(Task *T);
 
 #endif
