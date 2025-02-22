@@ -11,7 +11,7 @@ void print_dragon();
 
 static char *builtin[] = {
     "exit",   /* exits the shell */
-    "which",  /* displays full path to command */
+    //"which",  /* displays full path to command */
     "cd",     /* changes the working directory */
     "dragon",
     NULL
