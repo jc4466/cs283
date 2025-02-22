@@ -87,6 +87,8 @@ int main()
             fprintf(stderr, CMD_WARN_NO_CMD);
         } else if (P->ntasks > CMD_MAX) {
             fprintf(stderr, CMD_ERR_PIPE_LIMIT, CMD_MAX);
+        } else if (!strcmp(P->tasks[0].cmd, "exit")){
+            exit(EXIT_SUCCESS);
         } else {
             parse_debug(P);
         }
